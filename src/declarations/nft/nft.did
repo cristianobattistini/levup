@@ -1,0 +1,11 @@
+type NFT = 
+ service {
+   getApplicant: () -> (principal) query;
+   getAsset: () -> (vec nat8) query;
+   getCanisterId: () -> (principal) query;
+   getCertificationAuthority: () -> (principal) query;
+   getName: () -> (text) query;
+   getOwner: () -> (principal) query;
+   transferOwnership: (principal) -> (text);
+ };
+service : (text, nat, principal, vec nat8, principal, principal) -> NFT

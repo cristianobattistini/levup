@@ -4,6 +4,11 @@
       "main": "src/levup/main.mo",
       "type": "motoko"
     },
+    "ledger": {
+      "type": "custom",
+      "wasm": "ledger.wasm",
+      "candid": "ledger.private.did"
+    },
     "nft": {
       "main": "src/nft/nft.mo",
       "type": "motoko"
@@ -33,10 +38,9 @@
       "type": "assets"
     }
   },
-  "defaults": {
-    "build": {
-      "args": "",
-      "packtool": ""
+  "defaults":{
+    "replica": {
+      "subnet_type":"system"
     }
   },
   "dfx": "0.9.3",

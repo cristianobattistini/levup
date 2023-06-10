@@ -1,0 +1,14 @@
+type Note = 
+ record {
+   content: text;
+   title: text;
+ };
+service : {
+  balanceOf: (principal) -> (nat) query;
+  createNote: (text, text) -> () oneway;
+  getNotes: () -> (vec Note) query;
+  greet: () -> (text) query;
+  payOut: () -> (text);
+  removeNote: (nat) -> () oneway;
+  transfer: (principal, nat) -> (text);
+}

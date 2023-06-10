@@ -1,19 +1,61 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
-import "bootstrap/dist/css/bootstrap.min.css";
-import Item from "./Item";
-import Minter from "./Minter";
+import Navbar from "./Navbar";
+import Note from "./Note";
+import CreateArea from "./CreateArea";
+import FileUploader from "./FileUploader";
+import LoginButton from './LoginButton';
+
+
+import { levup } from "../../../declarations/levup";
 
 function App() {
-  // const NFTID = "rrkah-fqaaa-aaaaa-aaaaq-cai";
+  const [notes, setNotes] = useState([]);
+
+  function addNote(newNote) {
+    setNotes(prevNotes => {
+      levup.createNote(newNote.title, newNote.content);
+      return [newNote, ...prevNotes ]; //update frontend
+    });
+  }
+
+  useEffect(() => {
+    console.log("useEffect is triggered");
+    fetchData();
+  }, [])
+
+  async function fetchData(){
+    const notesArray = await levup.getNotes();
+    setNotes(notesArray)
+  }
+
+  function deleteNote(id) {
+    levup.removeNote(id);
+    setNotes(prevNotes => {
+      return prevNotes.filter((noteItem, index) => {
+        return index !== id;
+      });
+    });
+  }
 
   return (
-    <div className="App">
-      <Header />
-      {/* <Minter /> */}
-      {/* <Item id={NFTID}/> */}
-
+    <div>
+      <Navbar />
+      <LoginButton />
+      <CreateArea onAdd={addNote} />
+      <FileUploader />
+      {notes.map((noteItem, index) => {
+        return (
+          <Note
+            key={index}
+            id={index}
+            title={noteItem.title}
+            content={noteItem.content}
+            onDelete={deleteNote}
+          />
+        );
+      })}
       <Footer />
     </div>
   );
