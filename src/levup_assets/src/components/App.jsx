@@ -1,62 +1,40 @@
 import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
-import Navbar from "./Navbar";
-import Note from "./Note";
-import CreateArea from "./CreateArea";
-import FileUploader from "./FileUploader";
-import LoginButton from './LoginButton';
-
-
+import "bootstrap/dist/css/bootstrap.min.css";
 import { levup } from "../../../declarations/levup";
 
-function App() {
-  const [notes, setNotes] = useState([]);
+function App(props) {
+  // const NFTID = "rrkah-fqaaa-aaaaa-aaaaq-cai";
+  const [name, setName] = useState("");
+  const [type, setType] = useState("");
+  const [loaderHidden, setLoaderHidden] = useState(true);
 
-  function addNote(newNote) {
-    setNotes(prevNotes => {
-      levup.createNote(newNote.title, newNote.content);
-      return [newNote, ...prevNotes ]; //update frontend
-    });
+  
+
+  async function fetchUserData(){
+    setLoaderHidden(false)
+    const user = await levup.getPersonalData(props.loggedInPrincipal);
+    console.log(user);
+    setName(user.name);
+    setType(user.userType);
+    setLoaderHidden(true)
+
   }
 
   useEffect(() => {
-    console.log("useEffect is triggered");
-    fetchData();
-  }, [])
-
-  async function fetchData(){
-    const notesArray = await levup.getNotes();
-    setNotes(notesArray)
-  }
-
-  function deleteNote(id) {
-    levup.removeNote(id);
-    setNotes(prevNotes => {
-      return prevNotes.filter((noteItem, index) => {
-        return index !== id;
-      });
-    });
-  }
-
+    fetchUserData();
+  }, []);
   return (
-    <div>
-      <Navbar />
-      <LoginButton />
-      <CreateArea onAdd={addNote} />
-      <FileUploader />
-      {notes.map((noteItem, index) => {
-        return (
-          <Note
-            key={index}
-            id={index}
-            title={noteItem.title}
-            content={noteItem.content}
-            onDelete={deleteNote}
-          />
-        );
-      })}
-      <Footer />
+    <div className="App">
+      <Header principal={props.loggedInPrincipal} type = {type} name = {name}/>
+      <div hidden={loaderHidden} className="lds-ellipsis">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+       <Footer />
     </div>
   );
 }

@@ -1,28 +1,27 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { opend } from "../../../declarations/opend";
+import { levup } from "../../../declarations/levup";
 import { Principal } from "@dfinity/principal";
 import Item from "./Item";
 
-function Minter() {
+function ConfirmNft(props) {
   const { register, handleSubmit } = useForm();
-  const [nftPrincipal, setNFTPrincipal] = useState("");
+  const [result, setResult] = useState("");
   const [loaderHidden, setLoaderHidden] = useState(true);
 
   async function onSubmit(data) {
     setLoaderHidden(false);
-    const name = data.name;
-    const image = data.image[0];
-    const imageArray = await image.arrayBuffer();
-    const imageByteData = [...new Uint8Array(imageArray)];
+    const nftPrincipal = data.nftPrincipal;
+    const newOwnerPrincipal = data.newOwnerPrincipal;
 
-    const newNFTID = await opend.mint(imageByteData, name);
-    console.log(newNFTID.toText());
-    setNFTPrincipal(newNFTID);
+
+    const result = await levup.mint(props.principal, nftPrincipal, newOwnerPrincipal);
+    console.log(result);
+    setResult(result);
     setLoaderHidden(true);
   }
 
-  if (nftPrincipal == "") {
+  if (result == "") {
     return (
       <div className="minter-container">
         <div hidden={loaderHidden} className="lds-ellipsis">
@@ -38,22 +37,25 @@ function Minter() {
           Upload Image
         </h6>
         <form className="makeStyles-form-109" noValidate="" autoComplete="off">
-          <div className="upload-container">
-            <input
-              {...register("image", { required: true })}
-              className="upload"
-              type="file"
-              accept="image/x-png,image/jpeg,image/gif,image/svg+xml,image/webp"
-            />
-          </div>
           <h6 className="form-Typography-root makeStyles-subhead-102 form-Typography-subtitle1 form-Typography-gutterBottom">
             Collection Name
           </h6>
           <div className="form-FormControl-root form-TextField-root form-FormControl-marginNormal form-FormControl-fullWidth">
             <div className="form-InputBase-root form-OutlinedInput-root form-InputBase-fullWidth form-InputBase-formControl">
               <input
-                {...register("name", { required: true })}
-                placeholder="e.g. CryptoDunks"
+                {...register("nftPrincipal", { required: true })}
+                placeholder="Insert Principal of the NFT"
+                type="text"
+                className="form-InputBase-input form-OutlinedInput-input"
+              />
+              <fieldset className="PrivateNotchedOutline-root-60 form-OutlinedInput-notchedOutline"></fieldset>
+            </div>
+          </div>
+          <div className="form-FormControl-root form-TextField-root form-FormControl-marginNormal form-FormControl-fullWidth">
+            <div className="form-InputBase-root form-OutlinedInput-root form-InputBase-fullWidth form-InputBase-formControl">
+              <input
+                {...register("newOwnerPrincipal", { required: true })}
+                placeholder="Insert principal of the new owner"
                 type="text"
                 className="form-InputBase-input form-OutlinedInput-input"
               />
@@ -68,18 +70,23 @@ function Minter() {
         </form>
       </div>
     );
-  } else {
+  } else if(result == "Success") {
     return (
       <div className="minter-container">
         <h3 className="Typography-root makeStyles-title-99 Typography-h3 form-Typography-gutterBottom">
-          Minted!
+          Confirmed!
         </h3>
-        <div className="horizontal-center">
-          <Item id={nftPrincipal.toText()} />
-        </div>
+      </div>
+    );
+  } else {
+    return (
+    <div className="minter-container">
+        <h3 className="Typography-root makeStyles-title-99 Typography-h3 form-Typography-gutterBottom">
+          Not confirmed!
+        </h3>
       </div>
     );
   }
 }
 
-export default Minter;
+export default ConfirmNft;

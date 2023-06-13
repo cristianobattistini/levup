@@ -2,7 +2,6 @@ import ReactDOM from "react-dom";
 import React from "react";
 import App from "./components/App";
 import { AuthClient } from "@dfinity/auth-client";
-import { Principal } from "@dfinity/principal";
 
 const init = async () => {
   const authClient = await AuthClient.create();
@@ -11,7 +10,7 @@ const init = async () => {
     handleAuthenticated(authClient);
   } else {
     await authClient.login({
-      identityProvider: "https://identity.ic0.app/#authorize",
+      identityProvider: process.env.II_URL,
       onSuccess: () => {
         handleAuthenticated(authClient);
       },
@@ -21,8 +20,8 @@ const init = async () => {
 
 async function handleAuthenticated(authClient) {
   const identity = await authClient.getIdentity();
-  const userPrincipal = identity._principal.toString();
-  console.log(userPrincipal);
+  const userPrincipal = identity._principal;
+  console.log(userPrincipal.toText());
   ReactDOM.render(
     <App loggedInPrincipal={userPrincipal} />,
     document.getElementById("root")
