@@ -8,6 +8,7 @@ actor class NFT (name: Text, owner: Principal, content: [Nat8], nftApplicant: Pr
   private let asset = content;
   private let certificationAuthority = nftCertificationAuthority;
   private let applicant = nftApplicant;
+    private stable var blackHole: Principal = Principal.fromText("aaaaa-aa");
 
   public query func getName() : async Text{
     return itemName;

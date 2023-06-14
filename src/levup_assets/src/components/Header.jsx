@@ -95,7 +95,7 @@ function Header(props) {
         </Route>
         <Route path="/collection">{userOwnedGallery}</Route>
         <Route path="/confirm-nft" type={props.type} principal={props.principal}>
-          <ConfirmNft />
+          <ConfirmNft type={props.type} principal={props.principal} />
         </Route>
       </Switch>
     </BrowserRouter>

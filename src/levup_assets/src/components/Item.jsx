@@ -58,7 +58,6 @@ function Item(props) {
         <img
           className="disCardMedia-root makeStyles-image-19 disCardMedia-media disCardMedia-img"
           src={image}
-          style={blur}
         />
         <div className="lds-ellipsis" hidden={loaderHidden}>
           <div></div>
