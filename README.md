@@ -98,56 +98,35 @@ CANISTER_PUBLIC_KEY="principal \"$( \dfx canister id levup )\""
 
 ```
 echo $CANISTER_PUBLIC_KEY
-```
 
-4. Transfer half a billion tokens to the canister Principal ID:
-
-```
-dfx canister call levup transfer "($CANISTER_PUBLIC_KEY, 500_000_000)"
 ```
 
 # Deploy the Project to the Live IC Network
 
-1. Create and deploy canisters:
+Create and deploy canisters:
 
 ```
 dfx deploy --network ic
 ```
 
-2. Check the live canister ID:
+Check the live canister ID:
 
 ```
 dfx canister --network ic id levup
 ```
 
-3. Save the live canister ID to a command line variable:
+Save the live canister ID to a command line variable:
 
 ```
 LIVE_CANISTER_KEY="principal \"$( \dfx canister --network ic id levup )\""
-```
-
-4. Check that it worked:
 
 ```
-echo $LIVE_CANISTER_KEY
-```
 
-5. Transfer some levups to the live canister:
-
-```
-dfx canister --network ic call levup transfer "($LIVE_CANISTER_KEY, 50_000_000)"
-```
-
-6. Get live canister front-end id:
+Get live canister front-end id:
 
 ```
 dfx canister --network ic id levup_assets
 ```
-
-7. Copy the id from step 6 and add .raw.ic0.app to the end to form a URL.
-   e.g. blah-blah-blah.raw.ic0.app
-
-
 
 
 
