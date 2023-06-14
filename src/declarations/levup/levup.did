@@ -1,14 +1,16 @@
-type Note = 
+type User = 
  record {
-   content: text;
-   title: text;
+   name: text;
+   "principal": principal;
+   userType: text;
  };
 service : {
-  balanceOf: (principal) -> (nat) query;
-  createNote: (text, text) -> () oneway;
-  getNotes: () -> (vec Note) query;
-  greet: () -> (text) query;
-  payOut: () -> (text);
-  removeNote: (nat) -> () oneway;
-  transfer: (principal, nat) -> (text);
+  burn: (principal, principal) -> (text);
+  getLevupCanisterID: () -> (principal) query;
+  getOwnedNFTs: (principal) -> (vec principal) query;
+  getPersonalData: (principal) -> (User);
+  isPrincipalAlreadyRegistered: (principal) -> (bool);
+  mint: (principal, vec nat8, text, principal) -> (principal);
+  registerUser: (principal, text, text) -> (User);
+  transfer: (principal, principal, principal) -> (text);
 }

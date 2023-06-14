@@ -1,13 +1,30 @@
 export const idlFactory = ({ IDL }) => {
-  const Note = IDL.Record({ 'title' : IDL.Text, 'content' : IDL.Text });
+  const User = IDL.Record({
+    'userType' : IDL.Text,
+    'principal' : IDL.Principal,
+    'name' : IDL.Text,
+  });
   return IDL.Service({
-    'balanceOf' : IDL.Func([IDL.Principal], [IDL.Nat], ['query']),
-    'createNote' : IDL.Func([IDL.Text, IDL.Text], [], ['oneway']),
-    'getNotes' : IDL.Func([], [IDL.Vec(Note)], ['query']),
-    'greet' : IDL.Func([], [IDL.Text], ['query']),
-    'payOut' : IDL.Func([], [IDL.Text], []),
-    'removeNote' : IDL.Func([IDL.Nat], [], ['oneway']),
-    'transfer' : IDL.Func([IDL.Principal, IDL.Nat], [IDL.Text], []),
+    'burn' : IDL.Func([IDL.Principal, IDL.Principal], [IDL.Text], []),
+    'getLevupCanisterID' : IDL.Func([], [IDL.Principal], ['query']),
+    'getOwnedNFTs' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Vec(IDL.Principal)],
+        ['query'],
+      ),
+    'getPersonalData' : IDL.Func([IDL.Principal], [User], []),
+    'isPrincipalAlreadyRegistered' : IDL.Func([IDL.Principal], [IDL.Bool], []),
+    'mint' : IDL.Func(
+        [IDL.Principal, IDL.Vec(IDL.Nat8), IDL.Text, IDL.Principal],
+        [IDL.Principal],
+        [],
+      ),
+    'registerUser' : IDL.Func([IDL.Principal, IDL.Text, IDL.Text], [User], []),
+    'transfer' : IDL.Func(
+        [IDL.Principal, IDL.Principal, IDL.Principal],
+        [IDL.Text],
+        [],
+      ),
   });
 };
 export const init = ({ IDL }) => { return []; };

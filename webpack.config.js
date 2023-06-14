@@ -121,6 +121,7 @@ module.exports = {
       },
     },
     hot: true,
+    historyApiFallback: true,
     watchFiles: [path.resolve(__dirname, "src", frontendDirectory)],
     liveReload: true,
   },

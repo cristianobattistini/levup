@@ -8,4 +8,4 @@ type NFT =
    getOwner: () -> (principal) query;
    transferOwnership: (principal) -> (text);
  };
-service : (text, nat, principal, vec nat8, principal, principal) -> NFT
+service : (text, principal, vec nat8, principal, principal) -> NFT

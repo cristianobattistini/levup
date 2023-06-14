@@ -1,7 +1,20 @@
 // Version: 1.0.0
 type List<T> = ?(T, List<T>);
-type Note = {content : Text; title : Text};
+type NFT =
+  actor {
+    getApplicant : shared query () -> async Principal;
+    getAsset : shared query () -> async [Nat8];
+    getCanisterId : shared query () -> async Principal;
+    getCertificationAuthority : shared query () -> async Principal;
+    getName : shared query () -> async Text;
+    getOwner : shared query () -> async Principal;
+    transferOwnership : shared Principal -> async Text
+  };
+type NFT__1 = NFT;
+type User = {name : Text; principal : Principal; userType : Text};
 actor {
-  stable var balanceEntries : [(Principal, Nat)];
-  stable var notes : ?(Note, List<Note>)
+  stable var blackHole : Principal;
+  stable var stable_nftMap : [(Principal, NFT__1)];
+  stable var stable_ownedNftByUser : [(Principal, List<Principal>)];
+  stable var stable_userMap : [(Principal, User)]
 };

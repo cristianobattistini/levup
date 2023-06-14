@@ -11,15 +11,9 @@ import Option "mo:base/Option";
 actor Levup{
 
   public type User = {
-    firstName: Text;
-    lastName: Text;
-    email: Text;
-    principal: Principal;
-  };
-
-  public type CertificationAuth = {
     name: Text;
     principal: Principal;
+    userType : Text;
   };
 
   private stable var blackHole: Principal = Principal.fromText("aaaaa-aa");
@@ -27,13 +21,11 @@ actor Levup{
   var nftMap = HashMap.HashMap<Principal, NFTActorClass.NFT>(1, Principal.equal, Principal.hash);
   var ownerMap = HashMap.HashMap<Principal, List.List<Principal>>(1, Principal.equal, Principal.hash);
   var userMap = HashMap.HashMap<Principal, User>(1, Principal.equal, Principal.hash);
-  var certificationAuthorityMap = HashMap.HashMap<Principal, CertificationAuth>(1, Principal.equal, Principal.hash);
 
 
   stable var stable_nftMap: [(Principal, NFTActorClass.NFT)] = [];
   private stable var stable_ownedNftByUser: [(Principal, List.List<Principal>)] = [];
   stable var stable_userMap: [(Principal, User)] = [];
-  private stable var stable_certificationAuthorityMap: [(Principal, CertificationAuth)] = [];
 
 
   private let adminsList = List.push<Principal>(Principal.fromText("rnn4p-xv3hp-ivazl-hg2mb-iwkct-3emfl-upkcr-tz7dm-uxxqk-c7hux-nae"), null);
@@ -45,7 +37,6 @@ actor Levup{
     // saving all nft stored by the user
     stable_ownedNftByUser := Iter.toArray(ownerMap.entries());
     stable_userMap := Iter.toArray(userMap.entries());
-    stable_certificationAuthorityMap := Iter.toArray(certificationAuthorityMap.entries());
   };
 
   // The work required after a canister upgrade ends.
@@ -57,71 +48,63 @@ actor Levup{
             stable_ownedNftByUser.vals(), stable_ownedNftByUser.size(), Principal.equal, Principal.hash);
     userMap := HashMap.fromIter<Principal, User>(
             stable_userMap.vals(), stable_userMap.size(), Principal.equal, Principal.hash);
-    certificationAuthorityMap := HashMap.fromIter<Principal, CertificationAuth>(
-            stable_certificationAuthorityMap.vals(), stable_certificationAuthorityMap.size(), Principal.equal, Principal.hash);
   };
 
-  public shared(msg) func registerUser(id: Principal, firstName: Text, lastName: Text, email: Text) : async Text {
-    assert not Principal.isAnonymous(msg.caller);
-    let newUser: User = {
-            firstName = firstName; 
-            lastName = lastName;
-            email = email;
-            principal = msg.caller;
-    };
+  public shared(msg) func registerUser(callerId: Principal, name: Text, userType: Text) : async User {
+    // todo: fix with msg.caller that must substitute callerId: With simulated internet identity provider every call is made by anonymous user
+    Debug.print("regiser user");
+    Debug.print(debug_show(callerId));
+    assert not Principal.isAnonymous(callerId);
     //check if user is not already registered
-    var isUserPresent : Bool = switch (userMap.get(msg.caller)) {
+    var isUserPresent : Bool = switch (userMap.get(callerId)) {
       case null false;
       case (?result) true;
     };
     // a user can not be also registered as a certification authority
-    var isCertificationAuthorityPresent : Bool = switch (certificationAuthorityMap.get(msg.caller)) {
-      case null false;
-      case (?result) true;
-    };
     assert not isUserPresent;
-    assert not isCertificationAuthorityPresent;
-    userMap.put(msg.caller, newUser);
-    return "Success";
-  };
-
-  public shared(msg) func registerCertificationAuthority(id: Principal, name: Text) : async Text {
-    assert not Principal.isAnonymous(msg.caller);
-    let newCertificationAuthority: CertificationAuth = {
+    var newUserRegistered : User = {
+      name = "";
+      principal = blackHole;
+      userType = "";
+    }; 
+    Debug.print("regiser user: assert not isUserPresent passed");
+   if(userType == "user"){
+      let newUser: User = {
+                  name = name;
+                  principal = callerId;
+                  userType = userType;
+      };
+      newUserRegistered := newUser;
+    };
+    if(userType == "cert"){
+      let newCertificationAuthority: User = {
         name = name; 
-        principal = msg.caller;
+        principal = callerId;
+        userType = "cert"
     };
-    //controllare che l'utente non sia già registrato
-    var isCertificationAuthorityPresent : Bool = switch (certificationAuthorityMap.get(msg.caller)) {
-      case null false;
-      case (?result) true;
+      newUserRegistered := newCertificationAuthority;
     };
-    // a certification authority can not be also registered as a user
-    var isUserPresent : Bool = switch (userMap.get(msg.caller)) {
-      case null false;
-      case (?result) true;
-    };
-    assert not isUserPresent;
-    assert not isCertificationAuthorityPresent;    
-    certificationAuthorityMap.put(msg.caller, newCertificationAuthority);
-    return "Success";
+    userMap.put(callerId, newUserRegistered);
+    Debug.print("regiser user: user inserted");
+    return newUserRegistered
   };
 
-  public shared(msg) func isPrincipalAlreadyRegister() : async Bool {
-    var isCertificationAuthorityPresent : Bool = switch (certificationAuthorityMap.get(msg.caller)) {
-      case null false;
-      case (?result) true;
-    };
+  public shared(msg) func isPrincipalAlreadyRegistered(callerId: Principal) : async Bool {
+    // todo: fix with msg.caller that must substitute callerId: With simulated internet identity provider every call is made by anonymous user
     // a certification authority can not be also registered as a user
-    var isUserPresent : Bool = switch (userMap.get(msg.caller)) {
+    Debug.print("isPrincipalAlreadyRegistered");
+    Debug.print(debug_show(callerId));
+    var isUserPresent : Bool = switch (userMap.get(callerId)) {
       case null false;
       case (?result) true;
     };
-    return isCertificationAuthorityPresent or isUserPresent;
+    Debug.print(debug_show(isUserPresent));
+    return isUserPresent;
   };
 
 
   private func addToOwnershipMap(owner: Principal, nftId: Principal) {
+      Debug.print("addToOwnershipMap");
       var ownedNFTs : List.List<Principal> = switch (ownerMap.get(owner)) {
         case null List.nil<Principal>();
         case (?result) result;
@@ -129,9 +112,12 @@ actor Levup{
 
       ownedNFTs := List.push(nftId, ownedNFTs);
       ownerMap.put(owner, ownedNFTs);
+      Debug.print("added");
   };
 
   public query func getOwnedNFTs(user: Principal) : async [Principal] {
+    // todo: fix with msg.caller that must substitute callerId: With simulated internet identity provider every call is made by anonymous user
+    Debug.print("getOwnedNFTs");
     var userNFTs : List.List<Principal> = switch (ownerMap.get(user)) {
       case null List.nil<Principal>();
       case (?result) result;
@@ -146,15 +132,18 @@ actor Levup{
 
   // transfer can only be made by the certification authority, 
   // so the principal will be checked if it is the same as that of the authority ptincipal inserted by the applicant
-  public shared(msg) func transfer(id: Principal, newOwnerId: Principal) : async Text {
-    assert not Principal.isAnonymous(msg.caller);
+  public shared(msg) func transfer(callerId: Principal, id: Principal, newOwnerId: Principal) : async Text {
+    // todo: fix with msg.caller that must substitute callerId: With simulated internet identity provider every call is made by anonymous user
+    Debug.print("transfer");
+    Debug.print(debug_show(callerId));
+    assert not Principal.isAnonymous(callerId);
     var transferedNFT : NFTActorClass.NFT = switch (nftMap.get(id)) {
       case null return "NFT does not exist";
       case (?result) result
     };
     //only the certification authority can confirm and move the transfer process forward
     let certificationAuthorityNftPrincipal = await transferedNFT.getCertificationAuthority();
-    assert (certificationAuthorityNftPrincipal == msg.caller or admin == msg.caller);
+    assert (certificationAuthorityNftPrincipal == callerId or admin == callerId);
 
     let transferResult = await transferedNFT.transferOwnership(newOwnerId);
     if (transferResult == "Success") {
@@ -170,32 +159,41 @@ actor Levup{
       addToOwnershipMap(newOwnerId, id);
       return "Success";
     } else {
-      Debug.print("hello");
+      Debug.print("error transfering nft");
       return transferResult;
       
     }
   };
 
-  public shared(msg) func getPersonalData(isUser: Bool) : async Text {
-    var data = "";
-    if(isUser){
-      for ((key, value) in userMap.entries()) {
-        if(msg.caller == key){
-          data := value.firstName # value.lastName
-        }
-      };
-    }else{
-      for ((key, value) in certificationAuthorityMap.entries()) {
-        if(msg.caller == key){
-          data := value.name
-        }
-      };
+  public shared(msg) func getPersonalData(callerId: Principal) : async User {
+    // todo: fix with msg.caller that must substitute callerId: With simulated internet identity provider every call is made by anonymous user
+    Debug.print("getPersonalData");
+    Debug.print(debug_show(callerId));
+    var data : User = {
+      name = "";
+      principal = blackHole;
+      userType = "";
+    };
+                Debug.print(debug_show(userMap.size()));
+    for ((key, value) in userMap.entries()) {
+            Debug.print(debug_show(key));
+            Debug.print(debug_show(callerId));
+
+      if(callerId == key){
+        Debug.print("personal data found");
+        Debug.print(debug_show(value));
+
+        data := value;
+      }
     };
     return data;
   };
 
-  public shared(msg) func burn(id: Principal) : async Text {
-    assert not Principal.isAnonymous(msg.caller);
+  public shared(msg) func burn(callerId: Principal, id: Principal) : async Text {
+    // todo: fix with msg.caller that must substitute callerId: With simulated internet identity provider every call is made by anonymous user
+    Debug.print("burn");
+    Debug.print(debug_show(callerId));
+    assert not Principal.isAnonymous(callerId);
     var transferedNFT : NFTActorClass.NFT = switch (nftMap.get(id)) {
       case null return "NFT does not exist";
       case (?result) result
@@ -204,12 +202,12 @@ actor Levup{
     let certificationAuthorityNftPrincipal = await transferedNFT.getCertificationAuthority();
     let owner = await transferedNFT.getOwner();
 
-    assert (certificationAuthorityNftPrincipal == msg.caller or admin == msg.caller or owner == msg.caller);
+    assert (certificationAuthorityNftPrincipal == callerId or admin == callerId or owner == callerId);
 
      let transferResult = await transferedNFT.transferOwnership(blackHole);
     if (transferResult == "Success") {
       let backendId = await getLevupCanisterID();
-      var ownedNFTs : List.List<Principal> = switch (ownerMap.get(msg.caller)) {
+      var ownedNFTs : List.List<Principal> = switch (ownerMap.get(callerId)) {
         case null List.nil<Principal>();
         case (?result) result;
       };
@@ -220,7 +218,7 @@ actor Levup{
       addToOwnershipMap(blackHole, id);
       return "Success";
     } else {
-      Debug.print("hello");
+      Debug.print("error burning nft");
       return transferResult;
       
     }
@@ -230,10 +228,11 @@ actor Levup{
 
 
 
-  public shared(msg) func mint(data: [Nat8], name: Text, certificationAuthority: Principal) : async Principal {
-    assert not Principal.isAnonymous(msg.caller);
+  public shared(msg) func mint(callerId: Principal, data: [Nat8], name: Text, certificationAuthority: Principal) : async Principal {
+    // todo: fix with msg.caller that must substitute callerId: With simulated internet identity provider every call is made by anonymous user
+    assert not Principal.isAnonymous(callerId);
     // applicant of the request for certificate
-    let futureOwner : Principal = msg.caller;
+    let futureOwner : Principal = callerId;
 
     Debug.print(debug_show(Cycles.balance()));
     //Cycles.add(100_500_000_000);
@@ -241,11 +240,13 @@ actor Levup{
     let backendId = await getLevupCanisterID();
     let newNFT = await NFTActorClass.NFT(name, backendId, data, futureOwner, certificationAuthority);
     Debug.print(debug_show(Cycles.balance()));
-
+    Debug.print("nft created");
     let newNFTPrincipal = await newNFT.getCanisterId();
+    Debug.print(debug_show(newNFTPrincipal));
 
     nftMap.put(newNFTPrincipal, newNFT);
     addToOwnershipMap(backendId, newNFTPrincipal);
+    Debug.print("nft added!!");
 
     return newNFTPrincipal;
 

@@ -13,7 +13,6 @@ export const idlFactory = ({ IDL }) => {
 export const init = ({ IDL }) => {
   return [
     IDL.Text,
-    IDL.Nat,
     IDL.Principal,
     IDL.Vec(IDL.Nat8),
     IDL.Principal,

@@ -1,11 +1,28 @@
 import React from "react";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 
 function Footer() {
-  const currentYear = new Date().getFullYear();
+  const year = new Date().getFullYear();
+
   return (
-    <footer>
-      <p>Copyright ⓒ {currentYear}</p>
-    </footer>
+    <div id="footer">
+      <footer>
+        <Container fluid="md">
+          <Row>
+            <Col>
+              <p>
+                Levup
+              </p>
+            </Col>
+            <Col>
+              <p>Copyright ⓒ {year}</p>
+            </Col>
+          </Row>
+        </Container>
+      </footer>
+    </div>
   );
 }
 
