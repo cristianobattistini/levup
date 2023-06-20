@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Actor, HttpAgent } from "@dfinity/agent";
 import { idlFactory } from "../../../declarations/nft";
-
+import { AuthClient } from "@dfinity/auth-client";
+import { canisterId, createActor } from "../../../declarations/levup";
 
 function Item(props) {
   const [name, setName] = useState();
   const [owner, setOwner] = useState();
   const [image, setImage] = useState();
+  const [nftId, setNftId] = useState();
   const [authPrincipal, setCertificationAuthority] = useState();
   const [loaderHidden, setLoaderHidden] = useState(true);
   const [shouldDisplay, setDisplay] = useState(true);
@@ -30,6 +32,7 @@ function Item(props) {
     const owner = await NFTActor.getOwner();
     const imageData = await NFTActor.getAsset();
     const authPrincipal = await NFTActor.getCertificationAuthority();
+    const nftId = await NFTActor.getCanisterId()
 
     const imageContent = new Uint8Array(imageData);
     const image = URL.createObjectURL(
@@ -39,7 +42,8 @@ function Item(props) {
     setName(name);
     setOwner(owner.toText());
     setImage(image);
-    setCertificationAuthority(authPrincipal.toText());
+    setCertificationAuthority(authPrincipal.toText()); 
+    setNftId(nftId.toText()); 
     setLoaderHidden(true);
     setDisplay(true);
   }
@@ -66,15 +70,19 @@ function Item(props) {
           <div></div>
         </div>
         <div className="disCardContent-root">
-          <p className="disTypography-root makeStyles-bodyText-24 disTypography-body2 disTypography-colorTextSecondary">
-            Name: {name}
+          <p className="m-10 disTypography-root makeStyles-bodyText-24 disTypography-body2 disTypography-colorTextSecondary">
+            <strong>Certification Title:</strong> {name}
           </p>
-          <p className="disTypography-root makeStyles-bodyText-24 disTypography-body2 disTypography-colorTextSecondary">
-            Owner: {owner}
+          <p className="m-10 disTypography-root makeStyles-bodyText-24 disTypography-body2 disTypography-colorTextSecondary">
+          <strong>Certification ID:</strong> {nftId}
           </p>
-          <p className="disTypography-root makeStyles-bodyText-24 disTypography-body2 disTypography-colorTextSecondary">
-            Certification Authority: {authPrincipal}
+          <p className="m-10 disTypography-root makeStyles-bodyText-24 disTypography-body2 disTypography-colorTextSecondary">
+          <strong>Owner:</strong> {owner}
           </p>
+          <p className="m-10 disTypography-root makeStyles-bodyText-24 disTypography-body2 disTypography-colorTextSecondary">
+            <strong>Certification Authority:</strong> {authPrincipal}
+          </p>
+          
         </div>
       </div>
     </div>

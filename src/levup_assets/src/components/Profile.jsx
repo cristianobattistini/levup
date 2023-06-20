@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { levup } from "../../../declarations/levup";
+import { AuthClient } from "@dfinity/auth-client";
+import { canisterId, createActor } from "../../../declarations/levup";
 
 function Profile(props) {
   const [type, setType] = useState();
@@ -8,8 +9,27 @@ function Profile(props) {
   const [principal, setPrincipal] = useState(true);
   const [name, setName] = useState(true);
 
+  async function fetchUserData(){
+    setLoaderHidden(false)
+    const authClient = await AuthClient.create();
+    const identity = await authClient.getIdentity();
+    const authenticatedCanister = createActor(canisterId, {
+      agentOptions: {
+        identity,
+      },
+    });
+    const user = await authenticatedCanister.getPersonalData();
+    if(user){
+      setName(user.name);
+      setType(user.userType);
+      setPrincipal(user.principal.toText());
+    }
+    setLoaderHidden(true)
+
+  }
+
   useEffect(() => {
-    setType(props.type);
+    fetchUserData()
   }, [props.type]);
 
   const { register, handleSubmit } = useForm();
@@ -18,16 +38,20 @@ function Profile(props) {
     // Simulazione chiamata API per inviare le modifiche
     const fullname = data.name;
     const type = data.type;
-    console.log(data);
-    const newUser = await levup.registerUser(props.principal, fullname, type);
-    console.log(newUser);
+    const authClient = await AuthClient.create();
+    const identity = await authClient.getIdentity();
+    const authenticatedCanister = createActor(canisterId, {
+      agentOptions: {
+        identity,
+      },
+    });
+    const newUser = await authenticatedCanister.registerUser(fullname, type);
     setLoaderHidden(false);
     setName(newUser.name);
     setType(newUser.userType);
     setPrincipal(newUser.principal.toText())
   };
 
-  console.log(type)
   if (!type) {
     return (
         <div className="minter-container">

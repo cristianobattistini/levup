@@ -5,12 +5,12 @@ type User =
    userType: text;
  };
 service : {
-  burn: (principal, principal) -> (text);
+  burn: (principal) -> (text);
   getLevupCanisterID: () -> (principal) query;
-  getOwnedNFTs: (principal) -> (vec principal) query;
-  getPersonalData: (principal) -> (User);
-  isPrincipalAlreadyRegistered: (principal) -> (bool);
-  mint: (principal, vec nat8, text, principal) -> (principal);
-  registerUser: (principal, text, text) -> (User);
-  transfer: (principal, principal, principal) -> (text);
+  getOwnedNFTs: () -> (vec principal) query;
+  getPersonalData: () -> (User);
+  isPrincipalAlreadyRegistered: () -> (bool);
+  mint: (vec nat8, text, principal) -> (principal);
+  registerUser: (text, text) -> (User);
+  transfer: (principal, principal) -> (text);
 }

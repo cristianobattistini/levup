@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { levup } from "../../../declarations/levup";
 import { Principal } from "@dfinity/principal";
 import Item from "./Item";
+import { AuthClient } from "@dfinity/auth-client";
+import { canisterId, createActor } from "../../../declarations/levup";
 
 function Minter(props) {
   const { register, handleSubmit } = useForm();
@@ -17,8 +18,14 @@ function Minter(props) {
     const imageArray = await image.arrayBuffer();
     const imageByteData = [...new Uint8Array(imageArray)];
 
-    const newNFTID = await levup.mint(props.principal, imageByteData, name, Principal.fromText(authPrincipal));
-    console.log(newNFTID.toText());
+    const authClient = await AuthClient.create();
+    const identity = await authClient.getIdentity();
+    const authenticatedCanister = createActor(canisterId, {
+      agentOptions: {
+        identity,
+      },
+    });
+    const newNFTID = await authenticatedCanister.mint(imageByteData, name, Principal.fromText(authPrincipal));
     setNFTPrincipal(newNFTID);
     setLoaderHidden(true);
   }
@@ -74,7 +81,7 @@ function Minter(props) {
           </div>
           <div className="form-ButtonBase-root form-Chip-root makeStyles-chipBlue-108 form-Chip-clickable">
             <span onClick={handleSubmit(onSubmit)} className="form-Chip-label">
-              Mint NFT
+              Submit
             </span>
           </div>
         </form>

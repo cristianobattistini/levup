@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { levup } from "../../../declarations/levup";
 import { Principal } from "@dfinity/principal";
-import Item from "./Item";
+import { AuthClient } from "@dfinity/auth-client";
+import { canisterId, createActor } from "../../../declarations/levup";
+
 
 function ConfirmNft(props) {
   const { register, handleSubmit } = useForm();
@@ -13,11 +14,14 @@ function ConfirmNft(props) {
     setLoaderHidden(false);
     const nftPrincipal = data.nftPrincipal;
     const newOwnerPrincipal = data.newOwnerPrincipal;
-
-
-    console.log(props.principal, nftPrincipal,newOwnerPrincipal)
-    const result = await levup.transfer(props.principal, Principal.fromText(nftPrincipal), Principal.fromText(newOwnerPrincipal));
-    console.log(result);
+    const authClient = await AuthClient.create();
+    const identity = await authClient.getIdentity();
+    const authenticatedCanister = createActor(canisterId, {
+      agentOptions: {
+        identity,
+      },
+    });
+    const result = await authenticatedCanister.transfer(Principal.fromText(nftPrincipal), Principal.fromText(newOwnerPrincipal));
     setResult(result);
     setLoaderHidden(true);
   }

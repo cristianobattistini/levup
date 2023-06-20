@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { levup } from "../../../declarations/levup";
+import { canisterId, createActor } from "../../../declarations/levup";
+import { AuthClient } from "@dfinity/auth-client";
+
 
 function App(props) {
   // const NFTID = "rrkah-fqaaa-aaaaa-aaaaq-cai";
@@ -10,11 +12,18 @@ function App(props) {
   const [type, setType] = useState("");
   const [loaderHidden, setLoaderHidden] = useState(true);
 
-  
+
 
   async function fetchUserData(){
     setLoaderHidden(false)
-    const user = await levup.getPersonalData(props.loggedInPrincipal);
+    const authClient = await AuthClient.create();
+    const identity = await authClient.getIdentity();
+    const authenticatedCanister = createActor(canisterId, {
+      agentOptions: {
+        identity,
+      },
+    });
+    const user = await authenticatedCanister.getPersonalData();
     console.log(user);
     setName(user.name);
     setType(user.userType);

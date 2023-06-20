@@ -4,8 +4,7 @@ import Gallery from "./Gallery";
 import Profile from "./Profile"; 
 import ConfirmNft from "./ConfirmNft"; 
 import { AuthClient } from "@dfinity/auth-client";
-
-import { levup } from "../../../declarations/levup";
+import { canisterId, createActor } from "../../../declarations/levup";
 
 import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
 
@@ -16,8 +15,14 @@ function Header(props) {
 
   async function getNFTs() {
     if(props.principal){
-      const userNFTIds = await levup.getOwnedNFTs(props.principal);
-      console.log(userNFTIds);
+      const authClient = await AuthClient.create();
+      const identity = await authClient.getIdentity();
+      const authenticatedCanister = createActor(canisterId, {
+        agentOptions: {
+          identity,
+        },
+      });
+      const userNFTIds = await authenticatedCanister.getOwnedNFTs();
       setOwnedGallery(
         <Gallery title="My Certifications" ids={userNFTIds} principal={props.principal} role="collection" />
       );
@@ -36,7 +41,6 @@ function Header(props) {
 
   
   function renderNavLinks() {
-    console.log(props)
   if (props.type === "user") {
     return (
       <>
