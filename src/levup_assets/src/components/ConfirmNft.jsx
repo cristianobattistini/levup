@@ -32,7 +32,7 @@ function ConfirmNft(props) {
           <div></div>
         </div>
         <h3 className="makeStyles-title-99 Typography-h3 form-Typography-gutterBottom">
-          Confirm NFT
+          Confirm NFT Certifcation
         </h3>
         <h6 className="form-Typography-root makeStyles-subhead-102 form-Typography-subtitle1 form-Typography-gutterBottom">
           Principal NFT
@@ -65,7 +65,7 @@ function ConfirmNft(props) {
           </div>
           <div className="form-ButtonBase-root form-Chip-root makeStyles-chipBlue-108 form-Chip-clickable">
             <span onClick={handleSubmit(onSubmit)} className="form-Chip-label">
-              Confirm NFT
+              Confirm Certification
             </span>
           </div>
         </form>

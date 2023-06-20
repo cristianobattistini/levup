@@ -35,6 +35,7 @@ actor class NFT (name: Text, owner: Principal, content: [Nat8], nftApplicant: Pr
   };
 
   public shared(msg) func transferOwnership(newOwner: Principal) : async Text {
+    //TODO burn non funziona correttamente, da rivedere
     if (msg.caller == nftOwner) {
       nftOwner := newOwner;
       return "Success";

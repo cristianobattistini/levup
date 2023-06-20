@@ -3,7 +3,7 @@ import Minter from "./Minter";
 import Gallery from "./Gallery";
 import Profile from "./Profile"; 
 import ConfirmNft from "./ConfirmNft"; 
-
+import { AuthClient } from "@dfinity/auth-client";
 
 import { levup } from "../../../declarations/levup";
 
@@ -12,15 +12,22 @@ import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
 function Header(props) {
   const [userOwnedGallery, setOwnedGallery] = useState();
 
+
+
   async function getNFTs() {
     if(props.principal){
       const userNFTIds = await levup.getOwnedNFTs(props.principal);
       console.log(userNFTIds);
       setOwnedGallery(
-        <Gallery title="My NFTs" ids={userNFTIds} principal={props.principal} role="collection" />
+        <Gallery title="My Certifications" ids={userNFTIds} principal={props.principal} role="collection" />
       );
     }
 
+  }
+
+  async function handleLogout() {
+    await authClient.logout();
+    window.location.reload();
   }
 
   useEffect(() => {
@@ -34,13 +41,13 @@ function Header(props) {
     return (
       <>
         <button className="ButtonBase-root Button-root Button-text header-navButtons-3">
-          <Link to="/minter">Crea nuovo NFT</Link>
+          <Link to="/minter">Upload new Certification</Link>
         </button>
         <button className="ButtonBase-root Button-root Button-text header-navButtons-3">
           <Link to="/profile">Profile</Link>
         </button>
         <button className="ButtonBase-root Button-root Button-text header-navButtons-3">
-          <Link to="/collection">NFT Collection</Link>
+          <Link to="/collection">My Certifications</Link>
         </button>
       </>
     );
@@ -48,7 +55,7 @@ function Header(props) {
     return (
       <>
         <button className="ButtonBase-root Button-root Button-text header-navButtons-3">
-          <Link to="/confirm-nft">Confirm NFT</Link>
+          <Link to="/confirm-nft">Confirm Certification</Link>
         </button>
         <button className="ButtonBase-root Button-root Button-text header-navButtons-3">
           <Link to="/profile">Profile</Link>
@@ -79,6 +86,13 @@ function Header(props) {
             <div className="header-empty-6"></div>
             <div className="header-space-8"></div>
             {renderNavLinks()}
+            <button
+              id="logout"
+              className="ButtonBase-root Button-root Button-text header-navButtons-3"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
           </div>
         </header>
       </div>
