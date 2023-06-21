@@ -14,5 +14,5 @@ export interface _SERVICE {
       Principal
     >,
   'registerUser' : (arg_0: string, arg_1: string) => Promise<User>,
-  'transfer' : (arg_0: Principal, arg_1: Principal) => Promise<string>,
+  'transfer' : (arg_0: Principal) => Promise<string>,
 }

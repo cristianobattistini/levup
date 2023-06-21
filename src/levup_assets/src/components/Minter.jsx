@@ -40,8 +40,11 @@ function Minter(props) {
           <div></div>
         </div>
         <h3 className="makeStyles-title-99 Typography-h3 form-Typography-gutterBottom">
-          Create NFT
+          Upload your Certification
         </h3>
+        <p className="m-10 disTypography-root makeStyles-bodyText-24 disTypography-body2 disTypography-colorTextSecondary">
+           An NFT representing the Certification will be minted. This NFT will be in your possession as soon as the Certification is confirmed by the Certification Authority
+        </p>
         <h6 className="form-Typography-root makeStyles-subhead-102 form-Typography-subtitle1 form-Typography-gutterBottom">
           Upload Image
         </h6>
@@ -50,6 +53,7 @@ function Minter(props) {
             <input
               {...register("image", { required: true })}
               className="upload"
+              placeholder="Upload File"
               type="file"
               accept="image/x-png,image/jpeg,image/gif,image/svg+xml,image/webp"
             />
@@ -91,7 +95,7 @@ function Minter(props) {
     return (
       <div className="minter-container">
         <h3 className="Typography-root makeStyles-title-99 Typography-h3 form-Typography-gutterBottom">
-          Minted!
+          Uploaded!
         </h3>
         <div className="horizontal-center">
           <Item id={nftPrincipal.toText()} />

@@ -16,7 +16,7 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'registerUser' : IDL.Func([IDL.Text, IDL.Text], [User], []),
-    'transfer' : IDL.Func([IDL.Principal, IDL.Principal], [IDL.Text], []),
+    'transfer' : IDL.Func([IDL.Principal], [IDL.Text], []),
   });
 };
 export const init = ({ IDL }) => { return []; };

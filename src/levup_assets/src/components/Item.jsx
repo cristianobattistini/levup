@@ -9,6 +9,7 @@ function Item(props) {
   const [owner, setOwner] = useState();
   const [image, setImage] = useState();
   const [nftId, setNftId] = useState();
+  const [applicant, setApplicant] = useState();
   const [authPrincipal, setCertificationAuthority] = useState();
   const [loaderHidden, setLoaderHidden] = useState(true);
   const [shouldDisplay, setDisplay] = useState(true);
@@ -32,6 +33,7 @@ function Item(props) {
     const owner = await NFTActor.getOwner();
     const imageData = await NFTActor.getAsset();
     const authPrincipal = await NFTActor.getCertificationAuthority();
+    const applicant = await NFTActor.getApplicant();
     const nftId = await NFTActor.getCanisterId()
 
     const imageContent = new Uint8Array(imageData);
@@ -43,6 +45,7 @@ function Item(props) {
     setOwner(owner.toText());
     setImage(image);
     setCertificationAuthority(authPrincipal.toText()); 
+    setApplicant(applicant.toText()); 
     setNftId(nftId.toText()); 
     setLoaderHidden(true);
     setDisplay(true);
@@ -78,6 +81,9 @@ function Item(props) {
           </p>
           <p className="m-10 disTypography-root makeStyles-bodyText-24 disTypography-body2 disTypography-colorTextSecondary">
           <strong>Owner:</strong> {owner}
+          </p>
+          <p className="m-10 disTypography-root makeStyles-bodyText-24 disTypography-body2 disTypography-colorTextSecondary">
+          <strong>Applicant:</strong> {applicant}
           </p>
           <p className="m-10 disTypography-root makeStyles-bodyText-24 disTypography-body2 disTypography-colorTextSecondary">
             <strong>Certification Authority:</strong> {authPrincipal}

@@ -12,5 +12,5 @@ service : {
   isPrincipalAlreadyRegistered: () -> (bool);
   mint: (vec nat8, text, principal) -> (principal);
   registerUser: (text, text) -> (User);
-  transfer: (principal, principal) -> (text);
+  transfer: (principal) -> (text);
 }

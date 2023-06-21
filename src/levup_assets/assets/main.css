@@ -682,6 +682,12 @@ label[data-shrink="false"]
   width: 100%;
 }
 
+.button-white{
+  margin-right: 10px !important;
+  background-color: whitesmoke !important;
+  color: black !important;
+}
+
 .form-SvgIcon-root {
   fill: currentColor;
   width: 1em;

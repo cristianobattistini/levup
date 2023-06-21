@@ -130,7 +130,7 @@ actor Levup{
 
   // transfer can only be made by the certification authority, 
   // so the principal will be checked if it is the same as that of the authority ptincipal inserted by the applicant
-  public shared(msg) func transfer( id: Principal, newOwnerId: Principal) : async Text {
+  public shared(msg) func transfer( id: Principal) : async Text {
     Debug.print(debug_show(msg.caller));
     Debug.print("transfer");
     Debug.print(debug_show(msg.caller));
@@ -141,9 +141,10 @@ actor Levup{
     };
     //only the certification authority can confirm and move the transfer process forward
     let certificationAuthorityNftPrincipal = await transferedNFT.getCertificationAuthority();
+    let nftApplicant = await transferedNFT.getApplicant();
     assert (certificationAuthorityNftPrincipal == msg.caller or admin == msg.caller);
 
-    let transferResult = await transferedNFT.transferOwnership(newOwnerId);
+    let transferResult = await transferedNFT.transferOwnership(nftApplicant);
     if (transferResult == "Success") {
       let backendId = await getLevupCanisterID();
       var ownedNFTs : List.List<Principal> = switch (ownerMap.get(backendId)) {
@@ -154,7 +155,7 @@ actor Levup{
         return listItemId != id;
       });
 
-      addToOwnershipMap(newOwnerId, id);
+      addToOwnershipMap(nftApplicant, id);
       return "Success";
     } else {
       Debug.print("error transfering nft");
